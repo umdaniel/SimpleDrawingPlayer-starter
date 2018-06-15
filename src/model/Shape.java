@@ -6,8 +6,8 @@ import sound.MidiSynth;
 import java.awt.*;
 
 
-public class Shape {
-    private static Color PLAYING_COLOR;
+public abstract class Shape {
+    protected static Color PLAYING_COLOR;
 
     private int x;
     private int y;
@@ -18,7 +18,7 @@ public class Shape {
 
     private MidiSynth midiSynth;
     private int instrument;
-    private int playLineCoord;
+    protected int playLineCoord;
 
 
     public Shape(Point topLeft, MidiSynth midiSynth) {
@@ -40,6 +40,10 @@ public class Shape {
 
     // getters
     public int getWidth() { return width; }
+    public int getXCoord() { return x; }
+    public int getYCoord() { return y; }
+    public int getHeight() { return height; }
+    public boolean isSelected() { return selected; }
 
     // setters
     public void setPlayLineCoord(int playLineCoord) {
@@ -57,12 +61,7 @@ public class Shape {
     }
 
     // EFFECTS: return true if the given Point (x,y) is contained within the bounds of this Shape
-    public boolean contains(Point point) {
-        int point_x = point.x;
-        int point_y = point.y;
-
-        return containsX(point_x) && containsY(point_y);
-    }
+    public abstract boolean contains(Point point);
 
     // REQUIRES: the x,y coordinates of the Point are larger than the x,y coordinates of the shape
     // MODIFIES: this
@@ -74,25 +73,7 @@ public class Shape {
 
     // EFFECTS: draws this Shape on the SimpleDrawingPlayer, if the shape is selected, Shape is filled in
     //          else, Shape is unfilled (white)
-    public void draw(Graphics g) {
-        Color save = g.getColor();
-        if (selected) {
-            g.setColor(PLAYING_COLOR);
-        } else {
-            g.setColor(Color.white);
-        }
-        fillGraphics(g);
-        g.setColor(save);
-        drawGraphics(g);
-
-        if (playLineCoord > 0 && playLineCoord < width) {
-            g.setColor(Color.red);
-            g.drawLine(x + playLineCoord, y, x + playLineCoord, y + height);
-            g.setColor(save);
-        }
-    }
-
-
+    public abstract void draw(Graphics g);
 
     // MODIFIES: this
     // EFFECTS:  adds dx to the shapes x coordinate, and dy to the shapes y coordinate.
@@ -127,17 +108,6 @@ public class Shape {
             stopPlaying();
         }
     }
-
-    //EFFECTS: draws the shape
-    private void drawGraphics(Graphics g) {
-        g.drawRect(x, y, width, height);
-    }
-
-    //EFFECTS: fills the shape
-    private void fillGraphics(Graphics g) {
-        g.fillRect(x, y, width, height);
-    }
-
 
     // EFFECTS: starts playing this Shape, where sound is dependent on the area/coordinates of the Shape
     private void play(){
